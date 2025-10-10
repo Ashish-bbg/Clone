@@ -5,6 +5,9 @@ import cors from "cors";
 import User from "./models/userModel.js";
 import Review from "./models/reviewModel.js";
 import Product from "./models/productModel.js";
+import Order from "./models/orderModel.js";
+import Cart from "./models/cartModel.js";
+import Address from "./models/addressModel.js";
 
 dotenv.config();
 // connect to db
