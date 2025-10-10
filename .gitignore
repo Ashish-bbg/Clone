@@ -1,0 +1,42 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+
+# Logs
+logs
+*.log
+pids
+*.pid
+*.seed
+
+# Runtime data
+dist/
+build/
+
+# IDE / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# MacOS
+*.DS_Store
+
+# Coverage (for tests)
+coverage/
+
+# Temporary files
+tmp/
+temp/
+
+# Optional: if using npm package lock
+package-lock.json
+yarn.lock
+
+# Optional: frontend build folder (React/Vite)
+frontend/build/
