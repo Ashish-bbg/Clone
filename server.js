@@ -9,6 +9,8 @@ import Order from "./models/orderModel.js";
 import Cart from "./models/cartModel.js";
 import Address from "./models/addressModel.js";
 
+import authRoutes from "./routes/authRoutes.js";
+
 dotenv.config();
 // connect to db
 connectDB();
@@ -20,6 +22,11 @@ app.use(express.json());
 // Allowing all origin
 app.use(cors());
 const PORT = process.env.PORT || 5000;
+
+// router middlewares starts here
+app.use("/api/users", authRoutes);
+
+// route middlewares ends here
 
 app.get("/", (req, res) => {
   res.send("Everything is fine and running...");
