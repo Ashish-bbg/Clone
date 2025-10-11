@@ -1,11 +1,40 @@
 import Product from "../models/productModel.js";
 
+const DEFAULT_LIMIT = 10;
+const MAX_LIMIT = 50;
+
+const pagiNation = (page, limit) => {
+  let page = Number(page) || 1;
+  let limit = Number(limit) || DEFAULT_LIMIT;
+
+  if (limit > MAX_LIMIT) limit = MAX_LIMIT;
+  if (limit < 1) limit = DEFAULT_LIMIT;
+  const skip = (page - 1) * limit;
+
+  return { page, limit, skip };
+};
+
 // @desc Get all products
 // @route GET /api/products
 export const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find();
-    res.status(200).json(products);
+    // Pagination
+    const { page, limit, skip } = pagiNation(req.query.page, req.query.limit);
+
+    // Calculating the number of products to skip
+
+    // fetch products with limit & skip
+    const products = await Product.find().skip(skip).limit(limit);
+
+    // Total products count useful for frontend (optional)
+    const total = await Product.countDocuments();
+
+    res.status(200).json({
+      products,
+      page,
+      totalPages: Math.ceil(total / limit),
+      totalProducts: total,
+    });
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -37,7 +66,7 @@ export const getProductById = async (req, res) => {
 // @route GET /api/products/search?q=..
 export const searchProducts = async (req, res) => {
   try {
-    const { q, category, minPrice, maxPrice, sort } = req.query;
+    const { q, category, minPrice, maxPrice, sort, page, limit } = req.query;
 
     // build dynamic query
     const query = {};
@@ -56,13 +85,13 @@ export const searchProducts = async (req, res) => {
     }
 
     // filter by price range
-    if (minPrice || maxPrice) {
+    if (minPrice !== undefined || maxPrice !== undefined) {
       query.price = {};
       if (minPrice) {
-        query.price.$lte = Number(minPrice);
+        query.price.$gte = Number(minPrice);
       }
       if (maxPrice) {
-        query.price.$gte = Number(maxPrice);
+        query.price.$lte = Number(maxPrice);
       }
     }
 
@@ -77,10 +106,24 @@ export const searchProducts = async (req, res) => {
       sortOptions.createdAt = -1;
     }
 
-    // fetch results
-    const products = Product.find(query).sort(sortOptions);
+    // Pagination
+    const { page: pageNumber, limit: pageSize, skip } = pagiNation(page, limit);
 
-    res.status(200).json(products);
+    // fetch Products from MongoDB
+    const products = await Product.find(query)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(pageSize);
+
+    const total = await Product.countDocuments(query);
+
+    // send Responf
+    res.status(200).json({
+      products,
+      page: pageNumber,
+      totalPages: Math.ceil(total / pageSize),
+      totalProducts: total,
+    });
   } catch (error) {
     res.status(500).json({
       message: error.message,
