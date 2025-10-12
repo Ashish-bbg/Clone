@@ -3,9 +3,9 @@ import Product from "../models/productModel.js";
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 50;
 
-const pagiNation = (page, limit) => {
-  let page = Number(page) || 1;
-  let limit = Number(limit) || DEFAULT_LIMIT;
+const pagiNation = (pageNum, limitPerPage) => {
+  let page = Number(pageNum) || 1;
+  let limit = Number(limitPerPage) || DEFAULT_LIMIT;
 
   if (limit > MAX_LIMIT) limit = MAX_LIMIT;
   if (limit < 1) limit = DEFAULT_LIMIT;
@@ -87,10 +87,10 @@ export const searchProducts = async (req, res) => {
     // filter by price range
     if (minPrice !== undefined || maxPrice !== undefined) {
       query.price = {};
-      if (minPrice) {
+      if (minPrice && !isNaN(minPrice)) {
         query.price.$gte = Number(minPrice);
       }
-      if (maxPrice) {
+      if (maxPrice && !isNaN(maxPrice)) {
         query.price.$lte = Number(maxPrice);
       }
     }
@@ -117,10 +117,12 @@ export const searchProducts = async (req, res) => {
 
     const total = await Product.countDocuments(query);
 
+    // let currentPage = 0;
+    // if(total>0) currentPage = pageNumber
     // send Responf
     res.status(200).json({
       products,
-      page: pageNumber,
+      page: total === 0 ? 0 : pageNumber,
       totalPages: Math.ceil(total / pageSize),
       totalProducts: total,
     });
