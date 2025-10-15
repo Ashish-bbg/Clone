@@ -11,6 +11,7 @@ import Address from "./models/addressModel.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js";
 
 dotenv.config();
 // connect to db
@@ -27,6 +28,7 @@ const PORT = process.env.PORT || 5000;
 // router middlewares starts here
 app.use("/api/users", authRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
 
 // route middlewares ends here
 

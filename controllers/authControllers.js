@@ -5,7 +5,7 @@ import { generateTokenResponse } from "../utils/generateTokenResponse.js";
 // simple email regex
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // password must be 6+ chars, at least 1 number and 1 letter
-const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&{}]).{8,}$/;
+// const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&{}]).{8,}$/;
 
 const rules = {
   uppercase: /[A-Z]/,
