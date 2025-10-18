@@ -137,18 +137,6 @@ npm start
 2. Include the token in request headers for protected endpoints.
 3. Server validates the token via `authMiddleware.js`.
 
----
-
-## ⚡ Next Steps
-
-- Implement frontend with React to connect API endpoints.
-- Add product search and filtering.
-- Enhance order tracking with multiple statuses per order.
-- Deploy frontend and connect with backend API.
-- Implement user roles (admin/user) for product management.
-
----
-
 ## 📌 License
 
 This project is open-source and free to use for learning purposes.
