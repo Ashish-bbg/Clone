@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Product from "../models/productModel.js";
 
 const DEFAULT_LIMIT = 10;
@@ -46,7 +47,13 @@ export const getAllProducts = async (req, res) => {
 // @route GET /api/products/:id
 export const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).populate("reviews");
+    const id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Invalid product ID",
+      });
+    }
+    const product = await Product.findById(id).populate("reviews");
 
     if (!product) {
       res.status(404).json({
