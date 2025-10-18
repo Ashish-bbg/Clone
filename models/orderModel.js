@@ -3,9 +3,9 @@ import mongoose from "mongoose";
 const orderItemSchema = new mongoose.Schema({
   productId: {
     type: mongoose.Schema.Types.ObjectId,
-    quantity: Number,
-    price: Number,
   },
+  quantity: Number,
+  price: Number,
 });
 
 const orderSchema = new mongoose.Schema(
@@ -22,6 +22,7 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      enum: ["pending", "shipped", "delivered", "cancelled"],
       default: "pending",
     },
     shippingAddress: {

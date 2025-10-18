@@ -14,7 +14,7 @@ const productSchema = new mongoose.Schema({
   brand: String,
   stock: {
     type: Number,
-    default: 0,
+    default: 10,
   },
   images: [String],
   reviews: [
