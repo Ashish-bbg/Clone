@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Cart from "../models/cartModel.js";
 import Product from "../models/productModel.js";
 
@@ -6,6 +7,11 @@ import Product from "../models/productModel.js";
 export const getCartItems = async (req, res) => {
   try {
     const userId = req.user._id;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        message: "Invalid user ID",
+      });
+    }
     const cart = await Cart.findOne({ userId }).populate(
       "items.productId",
       "name price images"
@@ -26,13 +32,12 @@ export const getCartItems = async (req, res) => {
         productId: item.productId._id,
         name: item.productId.name,
         images: item.productId.images,
-        quatity: item.quantity,
+        quantity: item.quantity,
         price,
-        total: price * item.quantity,
       };
     });
 
-    const totalAmount = items.reduce((acc, item) => acc + item.total, 0);
+    const totalAmount = cart.totalAmount;
 
     res.status(200).json({
       items,
@@ -55,6 +60,12 @@ export const addToCart = async (req, res) => {
     if (!productId) {
       return res.status(400).json({
         message: "Product ID is required",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({
+        message: "Invalid product ID",
       });
     }
     // fetch product from DB
@@ -102,12 +113,17 @@ export const addToCart = async (req, res) => {
         cart.items.push({ productId, quantity, price: expectedPrice });
       }
     }
-
+    cart.totalAmount = cart.items.reduce(
+      (acc, item) => acc + item.quantity * item.price,
+      0
+    );
     await cart.save();
 
     res.status(200).json({
       message: "Item added to cart",
-      cart,
+      cart: cart.items,
+      totalItems: cart.items.length,
+      totalAmount: cart.totalAmount,
     });
   } catch (error) {
     res.status(500).json({
@@ -122,7 +138,7 @@ export const updateCartItem = async (req, res) => {
   try {
     const userId = req.user._id;
     const { productId } = req.params;
-    const { quantity } = req.body;
+    const quantity = Number(req.body.quantity);
     const cart = await Cart.findOne({ userId });
 
     if (!cart) {
@@ -141,7 +157,11 @@ export const updateCartItem = async (req, res) => {
       });
     }
 
-    item.quantity = quantity;
+    item.quantity = Math.max(1, quantity);
+    cart.totalAmount = cart.items.reduce(
+      (acc, item) => acc + item.quantity * item.price,
+      0
+    );
     await cart.save();
 
     res.status(200).json(cart);
@@ -159,6 +179,11 @@ export const removeCartItem = async (req, res) => {
     const userId = req.user._id;
     const { productId } = req.params;
 
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({
+        message: "Invalid product ID",
+      });
+    }
     const cart = await Cart.findOne({ userId });
 
     if (!cart) {
@@ -171,8 +196,17 @@ export const removeCartItem = async (req, res) => {
       (item) => item.productId.toString() !== productId
     );
 
+    cart.totalAmount = cart.items.reduce(
+      (acc, item) => acc + item.quantity * item.price,
+      0
+    );
+
     await cart.save();
-    res.status(200).json(cart);
+    res.status(200).json({
+      cart: cart.items,
+      totalItems: cart.items.length,
+      totalAmount: cart.totalAmount,
+    });
   } catch (error) {
     res.status(500).json({
       message: error.message,
