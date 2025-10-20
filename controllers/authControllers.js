@@ -17,15 +17,17 @@ const rules = {
 
 const validateUserValue = (name, email, password) => {
   if (!name || !email || !password) {
-    return res.status(400).json({
+    return {
+      valid: false,
       message: "All fields are required",
-    });
+    };
   }
 
   if (!emailRegex.test(email)) {
-    return res.status(400).json({
+    return {
+      valid: false,
       message: "Invalid email format",
-    });
+    };
   }
 
   const failedRules = [];
@@ -34,7 +36,15 @@ const validateUserValue = (name, email, password) => {
       failedRules.push(ruleName);
     }
   }
-  return failedRules;
+
+  if (failedRules.length > 0) {
+    return {
+      valid: false,
+      message: "Password invalid",
+      missing: failedRules,
+    };
+  }
+  return { valid: true };
 };
 
 // REGISTER
@@ -45,11 +55,11 @@ export const registerUser = async (req, res) => {
     name = name.toLowerCase();
     email = email.toLowerCase();
 
-    const failed = validateUserValue(name, email, password);
-    if (failed.length > 0) {
+    const validation = validateUserValue(name, email, password);
+    if (!validation.valid) {
       return res.status(400).json({
-        message: "Password invalid",
-        missing: failed,
+        message: validation.message,
+        missing: validation.missing || [],
       });
     }
 
