@@ -15,8 +15,6 @@ const rules = {
   minLength: /.{8,}/,
 };
 
-const failedRules = [];
-
 const validateUserValue = (name, email, password) => {
   if (!name || !email || !password) {
     return res.status(400).json({
@@ -30,6 +28,7 @@ const validateUserValue = (name, email, password) => {
     });
   }
 
+  const failedRules = [];
   for (const [ruleName, regex] of Object.entries(rules)) {
     if (!regex.test(password)) {
       failedRules.push(ruleName);
@@ -41,7 +40,10 @@ const validateUserValue = (name, email, password) => {
 // REGISTER
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    let { name, email } = req.body;
+    const { password } = req.body;
+    name = name.toLowerCase();
+    email = email.toLowerCase();
 
     const failed = validateUserValue(name, email, password);
     if (failed.length > 0) {
@@ -55,7 +57,7 @@ export const registerUser = async (req, res) => {
     const userExist = await User.findOne({ email });
     if (userExist) {
       return res.status(400).json({
-        message: "User already exists",
+        message: "Email already exists",
       });
     }
 
