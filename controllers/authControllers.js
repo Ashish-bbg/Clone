@@ -83,7 +83,11 @@ export const registerUser = async (req, res) => {
     });
 
     //  response to client
-    res.status(201).json(generateTokenResponse(user));
+    const userData = generateTokenResponse(res, user);
+
+    res.status(201).json({
+      userData,
+    });
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -107,7 +111,7 @@ export const loginUser = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({
-        message: "Email does not exist please register first",
+        message: "Invalid email or password",
       });
     }
 
@@ -115,17 +119,40 @@ export const loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({
-        message: "Email does not exist please register first",
+        message: "Invalid email or password",
       });
     }
 
     // password match
     if (isMatch) {
-      res.json(generateTokenResponse(user));
+      const userData = generateTokenResponse(res, user);
+      res.status(200).json({
+        userData,
+      });
     }
   } catch (error) {
     res.status(500).json({
       message: error.message,
     });
+  }
+};
+
+// @DESC LOGOUT
+// POST
+
+export const logout = (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      path: "/",
+    });
+    return res.status(200).json({
+      message: "Logged out successfully",
+    });
+  } catch (err) {
+    console.error("Logout error:", err.message);
+    return res.status(500).json({ message: "Unable to clear cookie" });
   }
 };

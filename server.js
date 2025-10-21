@@ -13,6 +13,7 @@ import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import ordersRoutes from "./routes/ordersRoutes.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 // connect to db
@@ -21,9 +22,14 @@ connectDB();
 // app
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: "https://clone-frontend-opal.vercel.app",
+    credentials: true,
+  })
+);
 
-// Allowing all origin
-app.use(cors());
 const PORT = process.env.PORT || 5000;
 
 // router middlewares starts here
