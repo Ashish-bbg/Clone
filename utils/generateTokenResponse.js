@@ -7,7 +7,7 @@ export const generateTokenResponse = (res, user) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "None",
     path: "/", // always attach to all routes
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
