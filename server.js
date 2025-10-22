@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://clone-frontend-opal.vercel.app",
+    origin: ["https://clone-frontend-opal.vercel.app", "http://localhost:5173"],
     credentials: true,
   })
 );
