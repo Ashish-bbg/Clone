@@ -3,7 +3,6 @@ import {
   loginUser,
   logout,
   registerUser,
-  user,
 } from "../controllers/authControllers.js";
 import { protect } from "../middleware/authMiddleware.js";
 
